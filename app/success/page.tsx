@@ -1,71 +1,106 @@
-import { CheckCircle } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { CheckCircle2, MessageSquare, ShieldCheck, Play } from "lucide-react";
 
 export default function SuccessPage() {
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  
   const whatsappNumber = "2349161419514";
   const message = encodeURIComponent("Hi, I just watched the training and I am ready to start using Fynax Bookkeeper!");
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 py-12 px-6">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        
-        {/* Header */}
-        <div className="bg-[#0A192F] text-center py-10 px-6">
-          <div className="flex justify-center mb-4">
-            <CheckCircle className="text-green-400 w-16 h-16" />
+    <div className="min-h-screen bg-[#F0F4FA] font-sans text-slate-900 selection:bg-[#378ADD] selection:text-white pb-20">
+      
+      {/* --- NAVIGATION --- */}
+      <nav className="flex items-center justify-between px-6 md:px-10 py-5 bg-[#042C53] border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#378ADD] rounded-lg flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-            🎉 You're In! Your Free Training is Ready
+          <span className="text-lg font-medium text-white tracking-tight">Fynax Bookkeeper</span>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-6 mt-12">
+        
+        {/* HEADER */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
+            <CheckCircle2 size={32} className="text-green-600" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">
+            You're In! Your Free Training is Ready
           </h1>
-          <p className="text-slate-300 text-lg">
-            Watch it now — it's only 30 minutes and it could change how you run your business forever.
+          <p className="text-slate-500 text-lg">
+            Watch it now — these 30 minutes could change how you run your business forever.
           </p>
         </div>
 
-        {/* Video Embed */}
-        <div className="aspect-w-16 aspect-h-9 w-full bg-black">
-          <iframe 
-            src="https://www.youtube.com/embed/krVjVaNmAEY?si=Bi8I9DXanFkYVkdD" 
-            title="Fynax Free Training"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-            className="w-full h-[300px] md:h-[500px]"
-          ></iframe>
+        {/* FAST-LOADING VIDEO CONTAINER */}
+        <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-12">
+          <div className="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden group">
+            {!isVideoLoaded ? (
+              <button 
+                onClick={() => setIsVideoLoaded(true)}
+                className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer"
+              >
+                {/* YouTube Thumbnail */}
+                <img 
+                  src="https://img.youtube.com/vi/krVjVaNmAEY/maxresdefault.jpg" 
+                  alt="Training Thumbnail" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                />
+                {/* Play Button Overlay */}
+                <div className="relative z-10 w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-red-700 transition-all duration-300">
+                  <Play size={36} className="text-white ml-2 fill-white" />
+                </div>
+              </button>
+            ) : (
+              <iframe 
+                src="https://www.youtube.com/embed/krVjVaNmAEY?autoplay=1" 
+                title="Fynax Free Training"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+              ></iframe>
+            )}
+          </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="p-8 md:p-12 text-center bg-blue-50/50">
-          <h2 className="text-2xl font-bold mb-4">
-            👇 Ready to Put What You Just Learned Into Action?
+        {/* CALL TO ACTION CARD */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-8 md:p-12 shadow-sm text-center">
+          <h2 className="text-2xl font-medium text-slate-900 mb-4 tracking-tight">
+            Ready to put what you just learned into action?
           </h2>
-          <p className="text-lg text-slate-700 mb-8 max-w-2xl mx-auto">
-            Meet <strong>Fynax Bookkeeper</strong> — the simplest way to keep clean business records on WhatsApp.
-            <br/><br/>
-            No app. No spreadsheet. No accountant needed. Just open WhatsApp, tell Fynax what happened in your business today, and it handles the rest.
+          <p className="text-[15px] text-slate-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Meet <strong>Fynax Bookkeeper</strong> — the simplest way to keep clean business records on WhatsApp. No app. No spreadsheet. No accountant needed. Just open WhatsApp, tell Fynax what happened in your business today, and it handles the rest.
           </p>
 
           <a 
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex justify-center items-center gap-2 w-full md:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl transition-all text-lg mb-4"
+            className="inline-flex justify-center items-center gap-3 w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] active:scale-[0.98] text-white font-medium py-4 px-10 rounded-xl transition-all text-[16px] shadow-sm mb-4"
           >
-            💬 Start Chatting Fynax on WhatsApp Now →
+            <MessageSquare size={20} className="fill-white" />
+            Start Chatting with Fynax on WhatsApp
           </a>
           
-          <p className="text-sm text-slate-500 italic block mt-2">
+          <p className="text-[13px] text-slate-500 mb-8">
             (It's free to start — no payment required)
           </p>
 
-          <div className="mt-8 pt-6 border-t border-slate-200">
-            <p className="text-sm font-medium text-slate-600">
-              Join hundreds of Nigerian business owners already using Fynax to track their finances with confidence.
-            </p>
-            <p className="text-xs text-slate-400 mt-4">
-              Brought to you by Fynax Bookkeeper
-            </p>
+          <div className="pt-8 border-t border-slate-100 flex flex-col items-center gap-2 text-center">
+            <div className="flex items-center gap-1.5 text-[13px] text-slate-600 font-medium">
+              <ShieldCheck size={16} className="text-[#185FA5]" />
+              Join hundreds of Nigerian business owners already using Fynax.
+            </div>
+            <p className="text-[12px] text-slate-400 mt-2">Brought to you by Fynax Bookkeeper</p>
           </div>
         </div>
+
       </div>
     </div>
   );
