@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         "Authorization": `Zoho-enczapikey ${zeptoMailToken}`
       },
       body: JSON.stringify({
-        from: { address: "hello@fynaxbookkeeper.com", name: "Ridwanullah | Fynax Bookkeeper" },
+        from: { address: "hello@fynaxtech.com", name: "Ridwanullah | Fynax Bookkeeper" },
         to: [{ email_address: { address: email, name: firstName } }],
         subject: "Here's your free record-keeping training 🎓",
         htmlbody: `
