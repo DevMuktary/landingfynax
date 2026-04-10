@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     // CHANGE THIS URL IF YOUR DASHBOARD SAYS .eu OR .in
     const zeptoMailUrl = process.env.ZEPTOMAIL_URL || "https://api.zeptomail.com/v1.1/email"; 
     const zeptoMailToken = process.env.ZEPTOMAIL_TOKEN;
-    const senderEmail = "hello@fynaxbookkeeper.com"; // MUST BE VERIFIED IN ZOHO
+    const senderEmail = "hello@fynaxtech.com"; // MUST BE VERIFIED IN ZOHO
 
     if (!zeptoMailToken) {
       console.error("[ERROR] ZEPTOMAIL_TOKEN is missing!");
