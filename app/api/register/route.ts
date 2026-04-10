@@ -123,6 +123,7 @@ export async function POST(req: Request) {
     console.error(JSON.stringify(error, null, 2));
     
     // We return success so the user still goes to the video page
-    return NextResponse.json({ success: true, lead });
+    // Scope error fixed: removed 'lead' from this return
+    return NextResponse.json({ success: true });
   }
 }
