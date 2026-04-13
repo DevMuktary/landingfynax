@@ -11,7 +11,19 @@ model Lead {
   id            String   @id @default(cuid())
   firstName     String
   email         String   @unique
-  lastEmailDay  Int      @default(0) // Tracks the last email day sent (0, 2, 4, 6...)
-  isActive      Boolean  @default(true) // Set to false if they unsubscribe
+  lastEmailDay  Int      @default(0)
+  isActive      Boolean  @default(true)
+  
+  // --- NEW ANALYTICS FIELDS ---
+  videoWatched  Boolean  @default(false)
+  emailsSent    Int      @default(0)
+  emailsOpened  Int      @default(0)
+  
   createdAt     DateTime @default(now())
+}
+
+model PageVisit {
+  id        String   @id @default(cuid())
+  path      String   // Tracks if they visited "/" or "/success"
+  createdAt DateTime @default(now())
 }
