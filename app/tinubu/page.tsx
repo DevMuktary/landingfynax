@@ -1,5 +1,5 @@
-
 import { PrismaClient } from '@prisma/client';
+import { unstable_noStore as noStore } from 'next/cache';
 import { 
   Users, 
   Eye, 
@@ -11,21 +11,28 @@ import {
   CheckCircle2
 } from "lucide-react";
 
-// This forces Next.js to always fetch fresh data when you refresh the page
+// Kill ALL Next.js server caching
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const prisma = new PrismaClient();
 
 export default async function AdminDashboard() {
+  // This physically forces the server to fetch fresh data on every single page load
+  noStore();
+
   // 1. Fetch raw data from the database
   const landingVisits = await prisma.pageVisit.count({ where: { path: '/' } });
   const leads = await prisma.lead.findMany({ orderBy: { createdAt: 'desc' } });
 
-  // 2. Calculate aggregations
+  // --- DEBUG LOG: Check your Railway logs to see the TRUTH ---
+  console.log("🔥 [ADMIN DASHBOARD] Raw Leads Data:", JSON.stringify(leads, null, 2));
+
+  // 2. Calculate aggregations (with safeguards in case of old null data)
   const totalLeads = leads.length;
   const totalVideoViews = leads.filter(l => l.videoWatched).length;
-  const totalEmailsSent = leads.reduce((sum, l) => sum + l.emailsSent, 0);
-  const totalEmailsOpened = leads.reduce((sum, l) => sum + l.emailsOpened, 0);
+  const totalEmailsSent = leads.reduce((sum, l) => sum + (l.emailsSent || 0), 0);
+  const totalEmailsOpened = leads.reduce((sum, l) => sum + (l.emailsOpened || 0), 0);
 
   // 3. Calculate conversion rates
   const conversionRate = landingVisits > 0 ? Math.round((totalLeads / landingVisits) * 100) : 0;
