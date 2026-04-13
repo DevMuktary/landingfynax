@@ -7,7 +7,8 @@ import {
   MailOpen, 
   Mail, 
   Percent,
-  TrendingUp
+  TrendingUp,
+  CheckCircle2
 } from "lucide-react";
 
 // This forces Next.js to always fetch fresh data when you refresh the page
