@@ -63,46 +63,55 @@ export async function POST(req: Request) {
 <meta charset="utf-8">
 <title>Your Free Training is Ready</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F0F4FA; -webkit-font-smoothing: antialiased;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F0F4FA; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f5;">
+  <table width="100%" bgcolor="#f4f4f5" cellpadding="0" cellspacing="0" border="0" style="padding: 30px 10px;">
     <tr>
       <td align="center">
-        <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; width: 100%; margin: 0 auto;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; font-family: Arial, Helvetica, sans-serif; color: #333333; background-color: #ffffff; border: 1px solid #e4e4e7;">
           
           <tr>
-            <td style="background-color: #042C53; padding: 35px 40px; text-align: center;">
-              <span style="color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">Fynax Bookkeeper</span>
+            <td style="padding: 25px 30px; border-bottom: 3px solid #185FA5; background-color: #ffffff;">
+              <h2 style="margin: 0; color: #042C53; font-size: 22px; font-weight: bold;">Fynax Bookkeeper</h2>
             </td>
           </tr>
           
           <tr>
-            <td style="padding: 40px;">
-              <h1 style="margin: 0 0 20px 0; font-size: 24px; color: #0f172a; font-weight: 600; letter-spacing: -0.5px;">Your Free Masterclass is Ready</h1>
+            <td style="padding: 30px; font-size: 16px; line-height: 1.6;">
+              <p style="margin-top: 0;">Hi <strong>${firstName}</strong>,</p>
               
-              <p style="margin: 0 0 16px 0; font-size: 16px; color: #475569; line-height: 1.6;">Hi <strong>${firstName}</strong>,</p>
+              <p>Welcome! You just made a brilliant decision for your business. A lot of Nigerian business owners work incredibly hard every day, but still can't tell you exactly how much they made, what they spent, or whether their business is actually growing.</p>
               
-              <p style="margin: 0 0 16px 0; font-size: 16px; color: #475569; line-height: 1.6;">Welcome! You just made a brilliant decision for your business. A lot of Nigerian business owners work incredibly hard every day, but still can't tell you exactly how much they made, what they spent, or whether their business is actually growing.</p>
+              <p>This 30-minute training was created to change that forever.</p>
               
-              <p style="margin: 0 0 24px 0; font-size: 16px; color: #475569; line-height: 1.6;">This 30-minute training was created to change that forever.</p>
-              
-              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 25px 0; background-color: #f8fafc; border-left: 4px solid #185FA5;">
                 <tr>
-                  <td align="center" style="padding: 10px 0 35px 0;">
-                    <a href="${YOUTUBE_LINK}" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; padding: 16px 36px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 6px rgba(24, 95, 165, 0.2);">Watch the Masterclass Now &rarr;</a>
+                  <td style="padding: 20px;">
+                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a;">In this training, you will discover:</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.7;">
+                      <li><strong>The 6 essential records</strong> every business needs to survive</li>
+                      <li><strong>The silent profit killers</strong> draining your accounts right now</li>
+                      <li><strong>A simple 15-minute daily routine</strong> to track your money effortlessly</li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${YOUTUBE_LINK}" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Watch the Masterclass Now &rarr;</a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 0 0 16px 0; font-size: 16px; color: #475569; line-height: 1.6;">In this training, you will discover the 6 essential records every business needs, the silent profit killers draining your accounts, and the simple 15-minute daily routine to fix it.</p>
-              
-              <p style="margin: 0 0 0 0; font-size: 16px; color: #475569; line-height: 1.6;">To your business growth,<br><strong style="color: #0f172a; display: block; margin-top: 5px;">Ridwanullah</strong><span style="font-size: 14px; color: #64748b;">Fynax Bookkeeper</span></p>
+              <p>To your business growth,<br><br><strong style="color: #0f172a;">Ridwanullah</strong><br><span style="color: #64748b; font-size: 14px;">Fynax Bookkeeper</span></p>
             </td>
           </tr>
           
           <tr>
-            <td style="background-color: #F8FAFC; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0 0 10px 0; font-size: 13px; color: #64748b; font-weight: 500;">© ${new Date().getFullYear()} Fynax Bookkeeper. All rights reserved.</p>
-              <p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">You are receiving this because you registered for our free masterclass.<br>If you no longer wish to receive these emails, you can <a href="#" style="color: #185FA5; text-decoration: underline;">unsubscribe here</a>.</p>
+            <td style="padding: 20px 30px; background-color: #f8fafc; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e4e4e7;">
+              <p style="margin: 0 0 10px 0;">© ${new Date().getFullYear()} Fynax Bookkeeper. All rights reserved.</p>
+              <p style="margin: 0;">You are receiving this because you registered for our free masterclass. <a href="#" style="color: #185FA5; text-decoration: underline;">Unsubscribe</a></p>
             </td>
           </tr>
           
