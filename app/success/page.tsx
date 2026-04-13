@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, MessageSquare, ShieldCheck, Play } from "lucide-react";
 
-export default function SuccessPage() {
+// 1. We move the actual content into a child component
+function SuccessContent() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const searchParams = useSearchParams();
   const userEmail = searchParams.get('email'); // Get the email passed from the landing page
@@ -13,7 +14,7 @@ export default function SuccessPage() {
   const message = encodeURIComponent("Hi, I just watched the training and I am ready to start using Fynax Bookkeeper!");
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
 
-  // 1. Track the Page Visit
+  // Track the Page Visit
   useEffect(() => {
     fetch('/api/track', {
       method: 'POST',
@@ -22,7 +23,7 @@ export default function SuccessPage() {
     }).catch(() => {});
   }, []);
 
-  // 2. Track the Video Play
+  // Track the Video Play
   const handleVideoPlay = () => {
     setIsVideoLoaded(true);
     
@@ -126,5 +127,18 @@ export default function SuccessPage() {
 
       </div>
     </div>
+  );
+}
+
+// 2. We export the main page wrapped in Suspense so Next.js doesn't crash during build
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F0F4FA] flex items-center justify-center text-slate-500 font-medium">
+        Loading your training...
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
