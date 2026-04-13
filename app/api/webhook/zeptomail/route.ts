@@ -1,145 +1,42 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { SendMailClient } from "zeptomail";
 
 const prisma = new PrismaClient();
 
-// Configuration
-const SENDER_EMAIL = "noreply@fynaxtech.com"; 
-const SENDER_NAME = "Ridwanullah | Fynax Bookkeeper";
-const YOUTUBE_LINK = "https://youtu.be/krVjVaNmAEY?si=Bi8I9DXanFkYVkdD";
-
 export async function POST(req: Request) {
   try {
-    const { firstName, email } = await req.json();
-    console.log(`[START] Registration initiated for: ${email}`);
+    const body = await req.json();
+    
+    // DEBUG: This will show us exactly what ZeptoMail is sending
+    console.log("📥 [WEBHOOK RAW DATA]:", JSON.stringify(body).substring(0, 500));
 
-    // 1. Save to PostgreSQL
-    const lead = await prisma.lead.upsert({
-      where: { email },
-      update: { firstName },
-      create: { firstName, email },
-    });
-    console.log(`[SUCCESS] Saved to database: ${lead.email}`);
+    // Support both array-based and object-based payloads from ZeptoMail
+    const eventName = body.event_name?.[0] || body.event;
+    const eventMessage = body.event_message?.[0] || body;
 
-    // 2. Setup ZeptoMail URL
-    let url = process.env.ZEPTOMAIL_URL || "https://api.zeptomail.com/v1.1/email";
-    if (url.endsWith('/send')) url = url.replace('/send', '');
-    if (!url.startsWith('http')) url = `https://${url}`;
+    const eventType = eventName || eventMessage?.event;
+    
+    // Robust email extraction
+    const toArray = eventMessage?.email_info?.to || [];
+    const recipientEmail = eventMessage?.recipient || eventMessage?.email_address || toArray[0]?.email_address?.address;
 
-    // 3. Setup ZeptoMail Token
-    let token = process.env.ZEPTOMAIL_TOKEN || "";
-    if (!token) {
-      console.error("❌ [ERROR] ZEPTOMAIL_TOKEN is missing from environment variables!");
-      return NextResponse.json({ success: true, lead }); // Still let user through to success page
-    }
-    if (!token.startsWith("Zoho-enczapikey")) {
-      token = `Zoho-enczapikey ${token}`;
+    if (!recipientEmail || recipientEmail === "undefined") {
+      console.log("⚠️ [WEBHOOK] No valid recipient email found. Skipping update.");
+      return NextResponse.json({ success: true });
     }
 
-    // 4. Initialize Client
-    const client = new SendMailClient({ url, token });
-    console.log(`🚀 Sending ZeptoMail to: ${email}`);
+    if (eventType === 'email_open' || eventType === 'email_link_click' || eventType === 'open' || eventType === 'click') {
+      await prisma.lead.updateMany({
+        where: { email: recipientEmail },
+        data: { emailsOpened: { increment: 1 } }
+      });
+      console.log(`✅ [ANALYTICS] Success: ${eventType} recorded for ${recipientEmail}`);
+    }
 
-    // 5. Send Email
-    const response = await client.sendMail({
-      from: {
-        address: SENDER_EMAIL,
-        name: SENDER_NAME,
-      },
-      to: [
-        {
-          email_address: {
-            address: email,
-            name: firstName,
-          },
-        },
-      ],
-      subject: "Here's your free record-keeping training 🎓",
-      htmlbody: `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Your Free Training is Ready</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5;">
-  <table width="100%" bgcolor="#f4f4f5" cellpadding="0" cellspacing="0" border="0" style="padding: 30px 10px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; font-family: Arial, Helvetica, sans-serif; color: #333333; background-color: #ffffff; border: 1px solid #e4e4e7;">
-          
-          <tr>
-            <td style="padding: 25px 30px; border-bottom: 3px solid #185FA5; background-color: #ffffff;">
-              <h2 style="margin: 0; color: #042C53; font-size: 22px; font-weight: bold;">Fynax Bookkeeper</h2>
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="padding: 30px; font-size: 16px; line-height: 1.6;">
-              <p style="margin-top: 0;">Hi <strong>${firstName}</strong>,</p>
-              
-              <p>Welcome! You just made a brilliant decision for your business. A lot of Nigerian business owners work incredibly hard every day, but still can't tell you exactly how much they made, what they spent, or whether their business is actually growing.</p>
-              
-              <p>This 30-minute training was created to change that forever.</p>
-              
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 25px 0; background-color: #f8fafc; border-left: 4px solid #185FA5;">
-                <tr>
-                  <td style="padding: 20px;">
-                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a;">In this training, you will discover:</p>
-                    <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.7;">
-                      <li><strong>The 6 essential records</strong> every business needs to survive</li>
-                      <li><strong>The silent profit killers</strong> draining your accounts right now</li>
-                      <li><strong>A simple 15-minute daily routine</strong> to track your money effortlessly</li>
-                    </ul>
-                  </td>
-                </tr>
-              </table>
-
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
-                <tr>
-                  <td align="center">
-                    <a href="${YOUTUBE_LINK}" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Watch the Masterclass Now &rarr;</a>
-                  </td>
-                </tr>
-              </table>
-              
-              <p>To your business growth,<br><br><strong style="color: #0f172a;">Ridwanullah</strong><br><span style="color: #64748b; font-size: 14px;">Fynax Bookkeeper</span></p>
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="padding: 20px 30px; background-color: #f8fafc; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e4e4e7;">
-              <p style="margin: 0 0 10px 0;">© ${new Date().getFullYear()} Fynax Bookkeeper. All rights reserved.</p>
-              <p style="margin: 0;">You are receiving this because you registered for our free masterclass. <a href="#" style="color: #185FA5; text-decoration: underline;">Unsubscribe</a></p>
-            </td>
-          </tr>
-          
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-      `,
-    });
-
-    console.log("✅ [SUCCESS] Email Sent Successfully:", response.message);
-
-    // --- INSTANTLY TRACK THE SENT EMAIL IN THE DATABASE ---
-    await prisma.lead.update({
-      where: { email: email },
-      data: { emailsSent: { increment: 1 } }
-    });
-
-    return NextResponse.json({ success: true, lead });
+    return NextResponse.json({ success: true });
 
   } catch (error: any) {
-    console.error("❌ [CRITICAL ERROR] ZeptoMail failed to send:");
-    console.error(JSON.stringify(error, null, 2));
-    
-    // We return success so the user still goes to the video page
-    // Scope error fixed: removed 'lead' from this return
-    return NextResponse.json({ success: true });
+    console.error("❌ [WEBHOOK CRITICAL ERROR]:", error.message);
+    return NextResponse.json({ success: true }); // Always return 200
   }
 }
