@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   PlayCircle, 
@@ -21,6 +21,15 @@ export default function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
+  // --- ANALYTICS: Track Page Visit ---
+  useEffect(() => {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'visit', path: '/' })
+    }).catch(() => {}); // Fails silently so it doesn't break the user experience
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -32,7 +41,8 @@ export default function LandingPage() {
     });
 
     if (res.ok) {
-      router.push("/success");
+      // --- ANALYTICS: Pass email to success page to track video views ---
+      router.push(`/success?email=${encodeURIComponent(email)}`);
     } else {
       alert("Something went wrong. Please try again.");
       setLoading(false);
