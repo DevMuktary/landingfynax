@@ -14,13 +14,21 @@ export async function POST(req: Request) {
     const { firstName, email } = await req.json();
     console.log(`[START] Registration initiated for: ${email}`);
 
-    // 1. Save to PostgreSQL
+    // --- BULLETPROOF FIX: We add the 'emailsSent' counter directly into the creation step ---
+    // This makes it physically impossible for the database to save the user but keep emailsSent at 0
     const lead = await prisma.lead.upsert({
       where: { email },
-      update: { firstName },
-      create: { firstName, email },
+      update: { 
+        firstName,
+        emailsSent: { increment: 1 } 
+      },
+      create: { 
+        firstName, 
+        email,
+        emailsSent: 1 
+      },
     });
-    console.log(`[SUCCESS] Saved to database: ${lead.email}`);
+    console.log(`[SUCCESS] Saved to DB with emailsSent count: ${lead.emailsSent}`);
 
     // 2. Setup ZeptoMail URL
     let url = process.env.ZEPTOMAIL_URL || "https://api.zeptomail.com/v1.1/email";
@@ -31,7 +39,7 @@ export async function POST(req: Request) {
     let token = process.env.ZEPTOMAIL_TOKEN || "";
     if (!token) {
       console.error("❌ [ERROR] ZEPTOMAIL_TOKEN is missing from environment variables!");
-      return NextResponse.json({ success: true, lead }); // Still let user through to success page
+      return NextResponse.json({ success: true, lead }); 
     }
     if (!token.startsWith("Zoho-enczapikey")) {
       token = `Zoho-enczapikey ${token}`;
@@ -68,21 +76,16 @@ export async function POST(req: Request) {
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; font-family: Arial, Helvetica, sans-serif; color: #333333; background-color: #ffffff; border: 1px solid #e4e4e7;">
-          
           <tr>
             <td style="padding: 25px 30px; border-bottom: 3px solid #185FA5; background-color: #ffffff;">
               <h2 style="margin: 0; color: #042C53; font-size: 22px; font-weight: bold;">Fynax Bookkeeper</h2>
             </td>
           </tr>
-          
           <tr>
             <td style="padding: 30px; font-size: 16px; line-height: 1.6;">
               <p style="margin-top: 0;">Hi <strong>${firstName}</strong>,</p>
-              
               <p>Welcome! You just made a brilliant decision for your business. A lot of Nigerian business owners work incredibly hard every day, but still can't tell you exactly how much they made, what they spent, or whether their business is actually growing.</p>
-              
               <p>This 30-minute training was created to change that forever.</p>
-              
               <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 25px 0; background-color: #f8fafc; border-left: 4px solid #185FA5;">
                 <tr>
                   <td style="padding: 20px;">
@@ -95,7 +98,6 @@ export async function POST(req: Request) {
                   </td>
                 </tr>
               </table>
-
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
                 <tr>
                   <td align="center">
@@ -103,18 +105,15 @@ export async function POST(req: Request) {
                   </td>
                 </tr>
               </table>
-              
               <p>To your business growth,<br><br><strong style="color: #0f172a;">Ridwanullah</strong><br><span style="color: #64748b; font-size: 14px;">Fynax Bookkeeper</span></p>
             </td>
           </tr>
-          
           <tr>
             <td style="padding: 20px 30px; background-color: #f8fafc; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e4e4e7;">
               <p style="margin: 0 0 10px 0;">© ${new Date().getFullYear()} Fynax Bookkeeper. All rights reserved.</p>
               <p style="margin: 0;">You are receiving this because you registered for our free masterclass. <a href="#" style="color: #185FA5; text-decoration: underline;">Unsubscribe</a></p>
             </td>
           </tr>
-          
         </table>
       </td>
     </tr>
@@ -130,9 +129,6 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("❌ [CRITICAL ERROR] ZeptoMail failed to send:");
     console.error(JSON.stringify(error, null, 2));
-    
-    // We return success so the user still goes to the video page
-    // Scope error fixed: removed 'lead' from this return
     return NextResponse.json({ success: true });
   }
 }
