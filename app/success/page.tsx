@@ -1,22 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle2, MessageSquare, ShieldCheck, Play } from "lucide-react";
 
 export default function SuccessPage() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const searchParams = useSearchParams();
+  const userEmail = searchParams.get('email'); // Get the email passed from the landing page
   
   const whatsappNumber = "2349161419514";
   const message = encodeURIComponent("Hi, I just watched the training and I am ready to start using Fynax Bookkeeper!");
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
 
+  // 1. Track the Page Visit
+  useEffect(() => {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'visit', path: '/success' })
+    }).catch(() => {});
+  }, []);
+
+  // 2. Track the Video Play
+  const handleVideoPlay = () => {
+    setIsVideoLoaded(true);
+    
+    if (userEmail) {
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'video_play', email: userEmail })
+      }).catch(() => {});
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F0F4FA] font-sans text-slate-900 selection:bg-[#378ADD] selection:text-white pb-20">
+    <div className="min-h-screen bg-[#F0F4FA] font-sans text-slate-900 selection:bg-[#3b82f6] selection:text-white pb-20">
       
       {/* --- NAVIGATION --- */}
       <nav className="flex items-center justify-between px-6 md:px-10 py-5 bg-[#042C53] border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#378ADD] rounded-lg flex items-center justify-center">
+          <div className="w-9 h-9 bg-[#3b82f6] rounded-lg flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
           <span className="text-lg font-medium text-white tracking-tight">Fynax Bookkeeper</span>
@@ -38,21 +63,19 @@ export default function SuccessPage() {
           </p>
         </div>
 
-        {/* FAST-LOADING VIDEO CONTAINER */}
+        {/* FAST-LOADING TRACKED VIDEO CONTAINER */}
         <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-12">
           <div className="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden group">
             {!isVideoLoaded ? (
               <button 
-                onClick={() => setIsVideoLoaded(true)}
+                onClick={handleVideoPlay}
                 className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer"
               >
-                {/* YouTube Thumbnail */}
                 <img 
                   src="https://img.youtube.com/vi/krVjVaNmAEY/maxresdefault.jpg" 
                   alt="Training Thumbnail" 
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                 />
-                {/* Play Button Overlay */}
                 <div className="relative z-10 w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-red-700 transition-all duration-300">
                   <Play size={36} className="text-white ml-2 fill-white" />
                 </div>
