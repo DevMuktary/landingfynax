@@ -71,7 +71,7 @@ export const emailSequence = [
       <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 25px 0;">
         <tr>
           <td align="center">
-            <a href="https://yourdomain.com/success" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Re-watch the Masterclass &rarr;</a>
+            <a href="https://bookkeeper.fynaxtech.com/success" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Re-watch the Masterclass &rarr;</a>
           </td>
         </tr>
       </table>
@@ -101,7 +101,7 @@ export const emailSequence = [
 
       <p>Fynax captures it, organizes it, and gives you a clean report whenever you need it. It's bookkeeping that speaks your language.</p>
       <p>As a quick reminder, you can review how this process works inside the masterclass here:</p>
-      <p><a href="https://yourdomain.com/success" style="color: #185FA5; font-weight: bold; text-decoration: underline;">Access the Free Training →</a></p>
+      <p><a href="https://bookkeeper.fynaxtech.com/success" style="color: #185FA5; font-weight: bold; text-decoration: underline;">Access the Free Training →</a></p>
     `)
   },
   {
