@@ -1,4 +1,26 @@
-let emailsSent = 0;
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { sendZeptoMail } from "@/lib/zeptomail";
+import { emailSequence } from "@/lib/emails";
+
+const prisma = new PrismaClient();
+
+export async function GET(req: Request) {
+  // Security check: Ensure only your cron service can trigger this
+  const url = new URL(req.url);
+  const secret = url.searchParams.get("secret");
+
+  if (secret !== process.env.CRON_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    // Get all active leads
+    const leads = await prisma.lead.findMany({
+      where: { isActive: true }
+    });
+
+    let emailsSent = 0;
 
     for (const lead of leads) {
       // --- CALENDAR DAY MATH FIX ---
@@ -28,12 +50,22 @@ let emailsSent = 0;
         );
 
         if (success) {
-          // Update PostgreSQL so they don't receive it again
+          // Update PostgreSQL so they don't receive it again, AND update the dashboard tracker
           await prisma.lead.update({
             where: { id: lead.id },
-            data: { lastEmailDay: emailToSend.day }
+            data: { 
+              lastEmailDay: emailToSend.day,
+              emailsSent: { increment: 1 } // Keeps your Admin Dashboard accurate!
+            }
           });
           emailsSent++;
         }
       }
     }
+
+    return NextResponse.json({ success: true, emailsSent });
+  } catch (error) {
+    console.error("Cron Execution Error:", error);
+    return NextResponse.json({ error: "Cron execution failed" }, { status: 500 });
+  }
+}
