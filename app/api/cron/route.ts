@@ -1,30 +1,16 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { sendZeptoMail } from "@/lib/zeptomail";
-import { emailSequence } from "@/lib/emails";
-
-const prisma = new PrismaClient();
-
-export async function GET(req: Request) {
-  // Security check: Ensure only your cron service can trigger this
-  const url = new URL(req.url);
-  const secret = url.searchParams.get("secret");
-
-  if (secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    // Get all active leads
-    const leads = await prisma.lead.findMany({
-      where: { isActive: true }
-    });
-
-    let emailsSent = 0;
+let emailsSent = 0;
 
     for (const lead of leads) {
-      // Calculate days since registration
-      const msPassed = Date.now() - lead.createdAt.getTime();
+      // --- CALENDAR DAY MATH FIX ---
+      const today = new Date();
+      const createdDate = new Date(lead.createdAt);
+
+      // Strip the time (hours, minutes, seconds) so we only compare midnight to midnight
+      const todayMidnight = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+      const createdMidnight = Date.UTC(createdDate.getFullYear(), createdDate.getMonth(), createdDate.getDate());
+
+      // Now calculate the difference in pure calendar days
+      const msPassed = todayMidnight - createdMidnight;
       const daysPassed = Math.floor(msPassed / (1000 * 60 * 60 * 24));
 
       // Find the email that matches the current day, AND ensure we haven't sent it yet
@@ -51,10 +37,3 @@ export async function GET(req: Request) {
         }
       }
     }
-
-    return NextResponse.json({ success: true, emailsSent });
-  } catch (error) {
-    console.error("Cron Execution Error:", error);
-    return NextResponse.json({ error: "Cron execution failed" }, { status: 500 });
-  }
-}
