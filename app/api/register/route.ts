@@ -11,8 +11,24 @@ const YOUTUBE_LINK = "https://youtu.be/krVjVaNmAEY?si=Bi8I9DXanFkYVkdD";
 
 export async function POST(req: Request) {
   try {
-    const { firstName, email } = await req.json();
-    console.log(`[START] Registration initiated for: ${email}`);
+    const body = await req.json();
+
+    // 1. Extract exactly what Zapier/Facebook sent (with fallbacks)
+    const rawEmail = body.email || body.email_address;
+    const rawName = body.firstName || body.first_name || body.full_name || body.name;
+
+    // 2. Failsafe data cleaning
+    const email = rawEmail?.trim().toLowerCase();
+    
+    // Split full name and grab the first part. Default to "Friend" if missing entirely.
+    const firstName = rawName ? rawName.trim().split(" ")[0] : "Friend";
+
+    if (!email) {
+       console.log("❌ [ERROR] Payload missing email address.");
+       return NextResponse.json({ success: false, error: "No email provided" });
+    }
+
+    console.log(`[START] Registration initiated for: ${email} (Name: ${firstName})`);
 
     // --- BULLETPROOF FIX: We add the 'emailsSent' counter directly into the creation step ---
     // This makes it physically impossible for the database to save the user but keep emailsSent at 0
