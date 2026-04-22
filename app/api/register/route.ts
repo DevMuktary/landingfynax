@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 // Configuration
 const SENDER_EMAIL = "noreply@fynaxtech.com"; 
 const SENDER_NAME = "Ridwanullah | Fynax Bookkeeper";
-const YOUTUBE_LINK = "https://youtu.be/krVjVaNmAEY?si=Bi8I9DXanFkYVkdD";
 
 export async function POST(req: Request) {
   try {
@@ -117,7 +116,7 @@ export async function POST(req: Request) {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
                 <tr>
                   <td align="center">
-                    <a href="${YOUTUBE_LINK}" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Watch the Masterclass Now &rarr;</a>
+                    <a href="https://bookkeeper.fynaxtech.com/success?email=${email}" style="background-color: #185FA5; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 32px; border-radius: 4px; display: inline-block;">Watch the Masterclass Now &rarr;</a>
                   </td>
                 </tr>
               </table>
