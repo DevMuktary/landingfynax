@@ -23,6 +23,10 @@ export default async function AdminDashboard() {
 
   // 1. Fetch raw data from the database
   const landingVisits = await prisma.pageVisit.count({ where: { path: '/' } });
+  
+  // --- NEW: Fetch Success Page visits ---
+  const successVisits = await prisma.pageVisit.count({ where: { path: '/success' } }); 
+  
   const leads = await prisma.lead.findMany({ orderBy: { createdAt: 'desc' } });
 
   // --- DEBUG LOG: Check your Railway logs to see the TRUTH ---
@@ -34,10 +38,10 @@ export default async function AdminDashboard() {
   const totalEmailsSent = leads.reduce((sum, l) => sum + (l.emailsSent || 0), 0);
   const totalEmailsOpened = leads.reduce((sum, l) => sum + (l.emailsOpened || 0), 0);
 
-  // 3. Calculate conversion rates
+  // 3. Calculate conversion rates safely
   const conversionRate = landingVisits > 0 ? Math.round((totalLeads / landingVisits) * 100) : 0;
   const videoWatchRate = totalLeads > 0 ? Math.round((totalVideoViews / totalLeads) * 100) : 0;
-  const openRate = totalEmailsSent > 0 ? Math.round((totalEmailsOpened / totalEmailsSent) * 100) : 0;
+  const openRate = totalEmailsSent > 0 ? Math.min(100, Math.round((totalEmailsOpened / totalEmailsSent) * 100)) : 0;
 
   return (
     <div className="min-h-screen bg-[#F0F4FA] font-sans text-slate-900 pb-20">
@@ -55,15 +59,15 @@ export default async function AdminDashboard() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-8 mt-10">
+      <div className="max-w-[90rem] mx-auto px-6 md:px-8 mt-10">
         
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-slate-900">Funnel Overview</h1>
-          <p className="text-slate-500 text-sm mt-1">Real-time metrics from your landing page and email sequence.</p>
+          <p className="text-slate-500 text-sm mt-1">Real-time metrics from your landing page, Meta ads, and email sequence.</p>
         </div>
 
-        {/* --- KPI STAT CARDS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        {/* --- KPI STAT CARDS (Now 5 columns wide) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
           
           {/* Card 1: Visitors */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -73,7 +77,7 @@ export default async function AdminDashboard() {
               </div>
             </div>
             <h3 className="text-3xl font-semibold text-slate-900 mb-1">{landingVisits}</h3>
-            <p className="text-sm text-slate-500 font-medium">Total Landing Page Visits</p>
+            <p className="text-sm text-slate-500 font-medium">Landing Page Visits</p>
           </div>
 
           {/* Card 2: Leads */}
@@ -91,7 +95,18 @@ export default async function AdminDashboard() {
             <p className="text-sm text-slate-500 font-medium">Total Form Submits</p>
           </div>
 
-          {/* Card 3: Video Views */}
+          {/* Card 3: Success Page Visits (NEW) */}
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                <CheckCircle2 size={20} className="text-emerald-600" />
+              </div>
+            </div>
+            <h3 className="text-3xl font-semibold text-slate-900 mb-1">{successVisits}</h3>
+            <p className="text-sm text-slate-500 font-medium">Success Page Visits</p>
+          </div>
+
+          {/* Card 4: Video Views */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
@@ -105,7 +120,7 @@ export default async function AdminDashboard() {
             <p className="text-sm text-slate-500 font-medium">Video Plays</p>
           </div>
 
-          {/* Card 4: Email Opens */}
+          {/* Card 5: Email Opens */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
